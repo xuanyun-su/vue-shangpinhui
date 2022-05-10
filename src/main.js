@@ -30,6 +30,9 @@ import router from "@/router"
 import "swiper/css/swiper.css"
 new Vue({
   render: h => h(App),
+  beforeCreate(){
+    Vue.prototype.$bus = this;
+  },
   // 注册路由 底下的写法kv一致省略v小写的
   router,
   // 注册仓库 ：

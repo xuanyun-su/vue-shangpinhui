@@ -55,6 +55,11 @@
 <script>
 export default {
   name: "",
+  mounted(){
+    this.$bus.$on("clear",()=>{
+      this.keyword = "";
+    })
+  },
   data(){
     return {
       keyword: ""

@@ -11,39 +11,44 @@
             </li>
           </ul>
           <ul class="fl sui-tag">
-            <li class="with-x">手机</li>
-            <li class="with-x">iphone<i>×</i></li>
-            <li class="with-x">华为<i>×</i></li>
-            <li class="with-x">OPPO<i>×</i></li>
+            <li class="with-x" v-if="searchParams.categroyName">
+              {{ searchParams.categroyName
+              }}<i @click="removeCategoryName">x</i>
+            </li>
+            <li class="with-x" v-if="searchParams.keyword">
+              {{ searchParams.keyword }}<i @click="removeKeywored">x</i>
+            </li>
+            <li class="with-x" v-if="searchParams.trademark">
+              {{ searchParams.trademark.split(":")[1]
+              }}<i @click="removeTradeMark">x</i>
+            </li>
+            <li
+              class="with-x"
+              v-for="(attrValue, index) in searchParams.props"
+              :key="index"
+            >
+              {{ attrValue.split(":")[1] }}
+              <i  @click="removeAttr(index)">x</i>
+            </li>
           </ul>
         </div>
 
         <!--selector-->
-        <SearchSelector />
+        <SearchSelector @trademarkInfo="trademarkInfo" @attrInfo="attrInfo" />
 
         <!--details-->
         <div class="details clearfix">
           <div class="sui-navbar">
             <div class="navbar-inner filter">
               <ul class="sui-nav">
-                <li class="active">
-                  <a href="#">综合</a>
+                <li :class="{active:isOne}">
+                  <a   @click="changeOrder('1')">综合<span v-show="isOne" >{{isAsc?'↑':'↓'}}</span></a>
                 </li>
-                <li>
-                  <a href="#">销量</a>
+
+                <li :class="{active:isTwo}">
+                  <a  @click="changeOrder('2')" >价格<span v-show="isTwo" >{{isAsc?'↑':'↓'}}</span></a>
                 </li>
-                <li>
-                  <a href="#">新品</a>
-                </li>
-                <li>
-                  <a href="#">评价</a>
-                </li>
-                <li>
-                  <a href="#">价格⬆</a>
-                </li>
-                <li>
-                  <a href="#">价格⬇</a>
-                </li>
+
               </ul>
             </div>
           </div>
@@ -140,19 +145,19 @@ export default {
         category1Id: "",
         category2Id: "",
         category3Id: "",
-        // 分类名
-        categoryName: "",
         // 关键字
         keyword: "",
         // 品牌
         trademark: "",
         // 排序
-        order: "",
         // 平台售卖属性参数
         props: [],
         // 分页器 第几页 几页多少条
         pageNo: 1,
         pageSize: 10,
+        // 分类名
+        order: "1:desc",
+        categroyName: "",
       },
     };
   },
@@ -177,18 +182,84 @@ export default {
     //   goodslist:state=>state.search.searchlist.goodsList
     // })
     ...mapGetters(["goodsList"]),
+    isOne(){
+      return this.searchParams.order.indexOf("1")!=-1;
+    },
+    isTwo(){
+      return this.searchParams.order.indexOf("2")!=-1;
+    },
+    isAsc(){
+      return this.searchParams.order.indexOf("asc")!=-1;
+    },
+    isdesc(){
+      return this.searchParams.order.indexOf('desc')!=-1;
+    }
+    
   },
   methods: {
+    changeOrder(flag){
+      // let orginOrder = this.searchParams.order;
+      let orginFlag = this.searchParams.order.split(":")[0]
+      let orginSort = this.searchParams.order.split(":")[1]
+      let newOrder = "";
+      console.log(flag,orginFlag)
+      if(flag == orginFlag){
+        newOrder = `${orginFlag}:${orginSort=="desc"?"asc":"desc"}`
+      }else{
+        newOrder = `${flag}:${"desc"}`
+      }
+      this.searchParams.order = newOrder;
+      this.getData();
+    },
+    removeAttr(index){
+        this.searchParams.props.splice(index,1)
+        this.getData();
+    },
+    removeTradeMark() {
+      this.searchParams.trademark = undefined;
+      this.getData();
+    },
+    attrInfo(attr, attrValue) {
+      let props = `${attr.attrId}:${attrValue}:${attr.attrName}`;
+      if (this.searchParams.props.indexOf(props) == -1) {
+        this.searchParams.props.push(props);
+              this.getData();
+      }
+    },
+    trademarkInfo(trademark) {
+      // console.log("我是父组件",trademark)
+      this.searchParams.trademark = `${trademark.tmId}:${trademark.tmName}`;
+      this.getData();
+    },
+    // 删除关键字
+    removeKeywored() {
+      // 给服务器带的参数searchParams的kewyrod指控
+      this.searchParams.keyword = undefined;
+      this.$bus.$emit("clear");
+      if (this.$router.query) {
+        this.$router.push({ name: "search", query: this.$route.query });
+      }
+    },
     // 向服务器发请求获取数据
+    removeCategoryName() {
+      this.category1Id = undefined;
+      this.category2Id = undefined;
+      this.category3Id = undefined;
+      this.searchParams.categroyName = undefined;
+      this.getData();
+      if (this.$route.params) {
+        this.$router.push({ name: "search", params: this.$route.params });
+      }
+    },
     getData() {
       this.$store.dispatch("getSearchList", this.searchParams);
     },
   },
   watch: {
     $route(newValue, oldValue) {
-      this.searchParams.category1Id = "";
-      this.searchParams.category2Id = "";
-      this.searchParams.category3Id = "";
+      this.searchParams.category1Id = undefined;
+      this.searchParams.category2Id = undefined;
+      this.searchParams.category3Id = undefined;
       Object.assign(this.searchParams, newValue);
       this.getData();
     },
