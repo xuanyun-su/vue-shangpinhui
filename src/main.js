@@ -33,9 +33,16 @@ import * as API from "@/api"
 
 // 引入swiper样式
 import "swiper/css/swiper.css"
+import atm from "@/assets/images/1.gif"
 Vue.use(VueLazyload,{
-    loading:
+    loading: atm
 })
+
+import myPlugins from "@/plugins/myPlugin"
+Vue.use(myPlugins,{
+  name:"upper"
+});
+import "@/plugins/validate.js"
 new Vue({
   render: h => h(App),
   beforeCreate(){
