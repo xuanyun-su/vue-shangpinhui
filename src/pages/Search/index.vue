@@ -28,7 +28,7 @@
               :key="index"
             >
               {{ attrValue.split(":")[1] }}
-              <i  @click="removeAttr(index)">x</i>
+              <i @click="removeAttr(index)">x</i>
             </li>
           </ul>
         </div>
@@ -41,14 +41,17 @@
           <div class="sui-navbar">
             <div class="navbar-inner filter">
               <ul class="sui-nav">
-                <li :class="{active:isOne}">
-                  <a   @click="changeOrder('1')">综合<span v-show="isOne" >{{isAsc?'↑':'↓'}}</span></a>
+                <li :class="{ active: isOne }">
+                  <a @click="changeOrder('1')"
+                    >综合<span v-show="isOne">{{ isAsc ? "↑" : "↓" }}</span></a
+                  >
                 </li>
 
-                <li :class="{active:isTwo}">
-                  <a  @click="changeOrder('2')" >价格<span v-show="isTwo" >{{isAsc?'↑':'↓'}}</span></a>
+                <li :class="{ active: isTwo }">
+                  <a @click="changeOrder('2')"
+                    >价格<span v-show="isTwo">{{ isAsc ? "↑" : "↓" }}</span></a
+                  >
                 </li>
-
               </ul>
             </div>
           </div>
@@ -61,9 +64,9 @@
               >
                 <div class="list-wrap">
                   <div class="p-img">
-                    <a href="item.html" target="_blank"
-                      ><img :src="good.defaultImg"
-                    /></a>
+                    <router-link :to="`/detail/${good.id}`"><img :src="good.defaultImg"
+                    /></router-link>  
+   
                   </div>
                   <div class="price">
                     <strong>
@@ -97,35 +100,13 @@
               </li>
             </ul>
           </div>
-          <div class="fr page">
-            <div class="sui-pagination clearfix">
-              <ul>
-                <li class="prev disabled">
-                  <a href="#">«上一页</a>
-                </li>
-                <li class="active">
-                  <a href="#">1</a>
-                </li>
-                <li>
-                  <a href="#">2</a>
-                </li>
-                <li>
-                  <a href="#">3</a>
-                </li>
-                <li>
-                  <a href="#">4</a>
-                </li>
-                <li>
-                  <a href="#">5</a>
-                </li>
-                <li class="dotted"><span>...</span></li>
-                <li class="next">
-                  <a href="#">下一页»</a>
-                </li>
-              </ul>
-              <div><span>共10页&nbsp;</span></div>
-            </div>
-          </div>
+          <Pagination
+            :pageNo="searchParams.pageNo"
+            :pageSize="searchParams.pageSize"
+            :total="total"
+            :continues="5"
+            @getPageNo="getPageNo"
+          ></Pagination>
         </div>
       </div>
     </div>
@@ -178,42 +159,44 @@ export default {
     this.getData();
   },
   computed: {
+    ...mapState({
+      total: (state) => state.search.searchlist.total,
+    }),
     // ...mapState({
     //   goodslist:state=>state.search.searchlist.goodsList
     // })
     ...mapGetters(["goodsList"]),
-    isOne(){
-      return this.searchParams.order.indexOf("1")!=-1;
+    isOne() {
+      return this.searchParams.order.indexOf("1") != -1;
     },
-    isTwo(){
-      return this.searchParams.order.indexOf("2")!=-1;
+    isTwo() {
+      return this.searchParams.order.indexOf("2") != -1;
     },
-    isAsc(){
-      return this.searchParams.order.indexOf("asc")!=-1;
+    isAsc() {
+      return this.searchParams.order.indexOf("asc") != -1;
     },
-    isdesc(){
-      return this.searchParams.order.indexOf('desc')!=-1;
-    }
-    
+    isdesc() {
+      return this.searchParams.order.indexOf("desc") != -1;
+    },
   },
   methods: {
-    changeOrder(flag){
+    changeOrder(flag) {
       // let orginOrder = this.searchParams.order;
-      let orginFlag = this.searchParams.order.split(":")[0]
-      let orginSort = this.searchParams.order.split(":")[1]
+      let orginFlag = this.searchParams.order.split(":")[0];
+      let orginSort = this.searchParams.order.split(":")[1];
       let newOrder = "";
-      console.log(flag,orginFlag)
-      if(flag == orginFlag){
-        newOrder = `${orginFlag}:${orginSort=="desc"?"asc":"desc"}`
-      }else{
-        newOrder = `${flag}:${"desc"}`
+      console.log(flag, orginFlag);
+      if (flag == orginFlag) {
+        newOrder = `${orginFlag}:${orginSort == "desc" ? "asc" : "desc"}`;
+      } else {
+        newOrder = `${flag}:${"desc"}`;
       }
       this.searchParams.order = newOrder;
       this.getData();
     },
-    removeAttr(index){
-        this.searchParams.props.splice(index,1)
-        this.getData();
+    removeAttr(index) {
+      this.searchParams.props.splice(index, 1);
+      this.getData();
     },
     removeTradeMark() {
       this.searchParams.trademark = undefined;
@@ -223,7 +206,7 @@ export default {
       let props = `${attr.attrId}:${attrValue}:${attr.attrName}`;
       if (this.searchParams.props.indexOf(props) == -1) {
         this.searchParams.props.push(props);
-              this.getData();
+        this.getData();
       }
     },
     trademarkInfo(trademark) {
@@ -253,6 +236,10 @@ export default {
     },
     getData() {
       this.$store.dispatch("getSearchList", this.searchParams);
+    },
+    getPageNo(pageNo) {
+      this.searchParams.pageNo = pageNo;
+      this.getData()
     },
   },
   watch: {

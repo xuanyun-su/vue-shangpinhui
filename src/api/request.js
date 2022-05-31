@@ -3,6 +3,7 @@ import axios from "axios";
 import nprogress from 'nprogress';
 //引入进度条样式
 import "nprogress/nprogress.css";
+import store from "@/store";
 //1、对axios二次封装
 const requests = axios.create({
     //基础路径，requests发出的请求在端口号后面会跟改baseURl
@@ -13,8 +14,13 @@ const requests = axios.create({
 requests.interceptors.request.use(config => {
     //config内主要是对请求头Header配置
     //比如添加token
-
+    if(store.state.detail.uuid_token){
+        config.headers.userTempId = store.state.detail.uuid_token;
+    }
     //开启进度条
+    if(store.state.user.token){
+        config.headers.token = store.state.user.token
+    }
     nprogress.start();
     return config;
 })

@@ -86,7 +86,7 @@ export default {
     return {
       // 存储用户鼠标移动到哪一个一级分类
       currentIndex: -1,
-      show:true,
+      show:true
     };
   },
   // 组件挂载完毕，可以向服务器发请求
@@ -116,7 +116,7 @@ export default {
       // 鼠标移出currentIndex 变为-1
       this.currentIndex = -1;
       if(this.$route.path != '/home'){
-        show = false;
+        this.show = false;
       }
   
     },
@@ -152,14 +152,13 @@ export default {
       if(this.$route.params){
         location.params = this.$route.params;
       }
-      console.log(location);
       this.$router.push(location)
       }
     },
     // 当鼠标移入的时候 让商品分类列表进行展示
     enterShow(){
       if(this.$route.path != '/home'){
-        show = true;
+        this.show = true;
       }
     }
   },
@@ -283,14 +282,14 @@ export default {
     }
   // 过度动画的样式
   // 过度动画开始状态
-  .sort-enter{
-      height: 0;
-      transform: rotate(0deg)
-  }
-  .sort-enter-to{
-      height: 461px;
-      transform: rotate(360deg);
-  }
+  // .sort-enter{
+  //     height: 0;
+  //     transform: rotate(0deg)
+  // }
+  // .sort-enter-to{
+  //     height: 461px;
+  //     transform: rotate(360deg);
+  // }
 
   .sort-enter-active{
     transition: all .5s linear;

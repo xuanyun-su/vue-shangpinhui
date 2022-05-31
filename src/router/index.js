@@ -1,13 +1,10 @@
 // 配置路由的地方
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import routes from "./routes"
+import store from '@/store'
 // 使用插件
 Vue.use(VueRouter)
-// 引入路由组件
-import Home from "@/pages/Home"
-import Search from "@/pages/Search"
-import Login from "@/pages/Login"
-import Register from "@/pages/Register"
 
 
 let originPush = VueRouter.prototype.push;
@@ -33,35 +30,42 @@ VueRouter.prototype.replace = function(location,resolve,reject){
     }
 }
 // 配置路由
-export default new VueRouter({
+let router =   new VueRouter({
     // 配置路由
-    routes:[
-        {
-            path:"/home",
-            component:Home,
-            meta:{show:true},
-        },
-        {
-            path:"/search/:keyword?",
-            component:Search,
-            meta:{show:true},
-            name:"search"
-        },
-        {
-            path:"/login",
-            component:Login,
-            meta:{show:false},
-        },
-        {
-            path:"/register",
-            component:Register,
-            meta:{show:false},
-        },
-        // 重定向 在项目跑起来的时候 访问、，立马让他访问到首页
-        {
-            path:"*",
-            redirect:"/home"
-
-        }
-    ]
+    routes,
+    scrollBehavior(to,from,savedPosition){
+        return {y:0} // 滚动条在最上方
+    }
 })
+router.beforeEach(async (to,from,next)=>{
+    let token = store.state.user.token;
+    let name = store.state.user.userInfo.name;
+    if(token){
+       if(to.path === "/login"){
+           next("/");
+       }else{
+           if(name){
+               next();
+           }else{
+               try{
+               await store.dispatch("getUserInfo")
+               next();
+               }catch(error){
+               store.dispatch("LogOut");
+               next("\login")
+               }
+           }
+       } 
+    }else{
+        let toPath = to.path
+        if(toPath.indexOf('/trade') != -1|| toPath.indexOf('/pay')!=-1 ||  toPath.indexOf('/center') !=-1){
+            next('/login?redirect='+toPath)
+        }else{
+            next();
+        }
+        
+    }
+})
+
+
+export default router;
