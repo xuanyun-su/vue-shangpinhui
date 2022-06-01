@@ -1,4 +1,6 @@
 module.exports = {
+    // false打包时禁止输出map
+    productionSourceMap:false,
     //关闭eslint
     lintOnSave: false,
     devServer: {

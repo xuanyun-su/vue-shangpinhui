@@ -1,36 +1,23 @@
-// 引入路由组件
-import Home from "@/pages/Home"
-import Search from "@/pages/Search"
-import Login from "@/pages/Login"
-import Register from "@/pages/Register"
-import Detail from "@/pages/Detail"
-import AddCartSuccess  from "@/pages/AddCartSuccess"
-import ShopCart from "@/pages/ShopCart"
-import Trade from "@/pages/Trade"
-import Pay from "@/pages/Pay"
-import PaySuccess from "@/pages/PaySuccess"
-import Center from "@/pages/Center"
-import myOrder from "@/pages/Center/myOrder"
-import groupOrder from "@/pages/Center/groupOrder"
+
 
 export default [
     {
       path:"/paysucess",
-      component: PaySuccess,
+      component: ()=>import("@/pages/PaySuccess"),
       meta:{show:true},
     },
     {
         path:"/center",
-        component: Center,
+        component: ()=>import("@/pages/Center"),
         meta:{show:true},
         children:[
             {
                 path:"myorder",
-                component: myOrder,
+                component: ()=>import("@/pages/Center/myOrder"),
   
             },{
                 path:"grouporder",
-                component: groupOrder
+                component:  ()=>import("@/pages/Center/groupOrder")
             },{
                 path:"/center",
                 redirect:"/center/myorder"
@@ -39,13 +26,13 @@ export default [
       },
     {
         path:"/home",
-        component:Home,
+        component:()=>import("@/pages/Home"),
         name:"home",
         meta:{show:true},
     },
     {
         path:"/pay",
-        component:Pay,
+        component:()=>import("@/pages/Pay"),
         meta:{show:true},
         beforeEnter:(to,form,next)=>{
             if(from.path =="/trade"){
@@ -57,35 +44,35 @@ export default [
     },
     {
         path:"/search/:keyword?",
-        component:Search,
+        component:()=>import("@/pages/Search"),
         meta:{show:true},
         name:"search"
     },
     {
         path:"/login",
         name:"login",
-        component:Login,
+        component:()=>import("@/pages/Login"),
         meta:{show:false},
     },
     {
         path:"/detail/:skuId",
-        component:Detail,
+        component:()=>import("@/pages/Detail"),
         meta:{show:false},
     },
     {
         path:"/register",
-        component:Register,
+        component:()=>import("@/pages/Register"),
         meta:{show:false},
     },
     {
         path:"/addcartsuccess",
         name:"addcartsuccess",
-        component:AddCartSuccess,
+        component:()=>import("@/pages/AddCartSuccess"),
         meta:{show:true}
     },
     {
         path:"/shopcart",
-        component:ShopCart,
+        component:()=>import("@/pages/ShopCart"),
         meta:{show:true}
     },
     // 重定向 在项目跑起来的时候 访问、，立马让他访问到首页
@@ -95,7 +82,7 @@ export default [
 
     },{
         path:"/trade",
-        component:Trade,
+        component:()=>import("@/pages/Trade"),
         meta:{isShow:true},
         beforeEnter: (from,to,next)=>{
             if(from.path == '/shopcart'){
